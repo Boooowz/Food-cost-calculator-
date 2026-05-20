@@ -125,7 +125,7 @@ MIT License — δες [LICENSE](LICENSE)
 
 ## 👤 Δημιουργός
 
-**David** — Λογιστής, ιδιοκτήτης & developer 
+**David** — Λογιστής & developer 
 
 ---
 
