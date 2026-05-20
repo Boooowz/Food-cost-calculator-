@@ -47,10 +47,6 @@
 ### 📈 Στατιστικά Πωλήσεων
 Καταγραφή πωλήσεων ανά περίοδο (μήνας/εβδομάδα) → τροφοδοτεί το menu engineering.
 
-## 🚀 Χρήση
-
-### Online (GitHub Pages)
-👉 **[https://davidovaselos-9873.github.io/cost-manager/](https://davidovaselos-9873.github.io/cost-manager/)**
 
 ### Τοπικά
 1. Κατέβασε το `index.html`
@@ -104,7 +100,7 @@
 
 ## 🖼 Screenshots
 
-> _Δες την εφαρμογή σε λειτουργία στο [live demo](https://davidovaselos-9873.github.io/cost-manager/)_
+> _Δες την εφαρμογή σε λειτουργία στο [live demo](https://boooowz.github.io/cost-manager/)_
 
 ## 🛠 Τεχνικά
 
@@ -129,7 +125,7 @@ MIT License — δες [LICENSE](LICENSE)
 
 ## 👤 Δημιουργός
 
-**David** — Λογιστής, ιδιοκτήτης εστιατορίων & developer στη Ξάνθη
+**David** — Λογιστής, ιδιοκτήτης & developer 
 
 ---
 
