@@ -2,7 +2,7 @@
 
 > Επαγγελματική κοστολόγηση πιάτων και menu engineering για εστιατόρια. Standalone HTML εφαρμογή με τοπική αποθήκευση και υποστήριξη πολλαπλών εστιατορίων.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-d4a574?style=flat-square)](https://davidovaselos-9873.github.io/cost-manager/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-d4a574?style=flat-square)](https://boooowz.github.io/cost-manager/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![No Dependencies](https://img.shields.io/badge/dependencies-0-success?style=flat-square)](#)
 
