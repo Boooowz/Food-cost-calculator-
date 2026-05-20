@@ -1,0 +1,2357 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cost Manager · Κοστολόγηση Εστιατορίων</title>
+<style>
+:root {
+  --bg-0: #0a0e14;
+  --bg-1: #0f1419;
+  --bg-2: #161b22;
+  --bg-3: #1c2128;
+  --bg-hover: #22272e;
+  --border: #2d333b;
+  --border-strong: #444c56;
+  --text-1: #e6edf3;
+  --text-2: #adbac7;
+  --text-3: #768390;
+  --accent: #d4a574;
+  --accent-dim: #8b6f4a;
+  --accent-glow: rgba(212, 165, 116, 0.15);
+  --green: #3fb950;
+  --green-dim: rgba(63, 185, 80, 0.15);
+  --red: #f85149;
+  --red-dim: rgba(248, 81, 73, 0.15);
+  --blue: #539bf5;
+  --blue-dim: rgba(83, 155, 245, 0.12);
+  --yellow: #d29922;
+  --yellow-dim: rgba(210, 153, 34, 0.15);
+  --purple: #b083f0;
+  --purple-dim: rgba(176, 131, 240, 0.15);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --radius: 6px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', monospace;
+  background: var(--bg-0);
+  color: var(--text-1);
+  line-height: 1.5;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(212, 165, 116, 0.04) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(83, 155, 245, 0.04) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+header {
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--bg-0);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.brand-text {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.brand-text small {
+  display: block;
+  font-size: 10px;
+  color: var(--text-3);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.restaurant-switcher {
+  display: flex;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 3px;
+  gap: 2px;
+}
+
+.rest-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+}
+
+.rest-btn:hover { color: var(--text-1); }
+.rest-btn.active {
+  background: var(--accent);
+  color: var(--bg-0);
+}
+
+button, .btn {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  padding: 7px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+button:hover, .btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+button.primary {
+  background: var(--accent);
+  color: var(--bg-0);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+button.primary:hover {
+  background: #e6b886;
+  border-color: #e6b886;
+}
+
+button.danger { color: var(--red); }
+button.danger:hover { background: var(--red-dim); border-color: var(--red); }
+
+button.tiny {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+button.icon {
+  padding: 5px 8px;
+  min-width: 28px;
+  justify-content: center;
+}
+
+nav.tabs {
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  padding: 14px 18px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  letter-spacing: 0.02em;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.tab:hover { color: var(--text-2); background: transparent; }
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab .badge {
+  background: var(--bg-3);
+  color: var(--text-3);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+.tab.active .badge {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+main {
+  padding: 24px;
+  max-width: 100%;
+}
+
+.panel {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.panel-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.panel-title .accent { color: var(--accent); }
+
+.view { display: none; }
+.view.active { display: block; }
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+th {
+  background: var(--bg-2);
+  color: var(--text-2);
+  font-weight: 500;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+th.num, td.num { text-align: right; }
+th.center, td.center { text-align: center; }
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-1);
+  vertical-align: middle;
+}
+
+tr:hover td { background: var(--bg-2); }
+tr:last-child td { border-bottom: none; }
+
+.muted { color: var(--text-3); }
+.accent-text { color: var(--accent); }
+.green { color: var(--green); }
+.red { color: var(--red); }
+.blue { color: var(--blue); }
+.yellow { color: var(--yellow); }
+.purple { color: var(--purple); }
+
+input[type="text"], input[type="number"], select, textarea {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  border-radius: 4px;
+  outline: none;
+  transition: all 0.15s;
+  width: 100%;
+}
+
+input[type="text"]:hover, input[type="number"]:hover, select:hover {
+  border-color: var(--border-strong);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23adbac7' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+td input, td select { padding: 5px 8px; font-size: 12px; }
+
+input.tight { padding: 5px 8px; font-size: 12px; }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  min-width: 220px;
+  background: var(--bg-2);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23768390' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  padding-left: 32px;
+}
+
+.empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-3);
+}
+
+.empty-icon { font-size: 42px; opacity: 0.3; margin-bottom: 8px; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  color: var(--text-1);
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.2s;
+  font-size: 13px;
+}
+
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { border-color: var(--green); }
+.toast.error { border-color: var(--red); }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: var(--bg-1);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}
+
+.modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.modal.small { max-width: 420px; }
+
+.modal.small .modal-body p {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.form-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+@media (max-width: 600px) {
+  .form-grid.cols-2, .form-grid.cols-3 { grid-template-columns: 1fr; }
+}
+
+.field label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.field .hint {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.stat-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--accent);
+}
+
+.stat-card.green::before { background: var(--green); }
+.stat-card.red::before { background: var(--red); }
+.stat-card.blue::before { background: var(--blue); }
+.stat-card.purple::before { background: var(--purple); }
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+
+.row-info {
+  background: var(--blue-dim);
+  border-left: 3px solid var(--blue);
+  padding: 10px 14px;
+  margin: 0 20px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.row-info strong { color: var(--blue); }
+
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--bg-3);
+  color: var(--text-2);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tag.cat { background: var(--purple-dim); color: var(--purple); }
+.tag.subrecipe { background: var(--blue-dim); color: var(--blue); }
+
+.badge-status {
+  display: inline-block;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge-status.star { background: var(--green-dim); color: var(--green); }
+.badge-status.puzzle { background: var(--blue-dim); color: var(--blue); }
+.badge-status.plowhorse { background: var(--yellow-dim); color: var(--yellow); }
+.badge-status.dog { background: var(--red-dim); color: var(--red); }
+
+.ingredient-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 110px 110px 36px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ingredient-row:last-child { border-bottom: none; }
+
+@media (max-width: 700px) {
+  .ingredient-row {
+    grid-template-columns: 1fr 1fr 80px 36px;
+  }
+  .ingredient-row .qty-unit { display: none; }
+}
+
+.section-title {
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 18px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title:first-child { margin-top: 0; }
+
+.cost-summary {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 16px;
+}
+
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: 13px;
+}
+
+.cost-row.total {
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+  padding-top: 10px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* Recipe Card (printable) */
+.recipe-card {
+  background: white;
+  color: black;
+  padding: 30px;
+  font-family: Georgia, serif;
+  max-width: 600px;
+  margin: 20px auto;
+  border-radius: 8px;
+}
+
+.recipe-card h1 {
+  font-size: 26px;
+  margin-bottom: 4px;
+  border-bottom: 2px solid black;
+  padding-bottom: 10px;
+}
+
+.recipe-card .meta {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.recipe-card .meta span { margin-right: 16px; }
+
+.recipe-card h2 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 18px 0 8px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
+}
+
+.recipe-card .ingr-list { font-size: 14px; }
+.recipe-card .ingr-list div { padding: 3px 0; }
+.recipe-card .ingr-list .qty { display: inline-block; min-width: 80px; font-weight: 600; }
+
+.recipe-card .instructions {
+  font-size: 13px;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.recipe-card .footer {
+  margin-top: 30px;
+  padding-top: 14px;
+  border-top: 1px solid #ccc;
+  font-size: 11px;
+  color: #777;
+  display: flex;
+  justify-content: space-between;
+}
+
+@media print {
+  body * { visibility: hidden; }
+  .modal-overlay, .modal-overlay * { visibility: visible; }
+  .modal-overlay { position: absolute; background: white; }
+  .modal { box-shadow: none; border: none; }
+  .modal-header, .modal-footer { display: none; }
+  .recipe-card { background: white; color: black; max-width: 100%; }
+}
+
+.dish-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.dish-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.dish-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.dish-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dish-card-meta {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-bottom: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dish-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.dish-card-stat-label {
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dish-card-stat-value {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.menu-engineering-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 18px;
+}
+
+@media (max-width: 768px) {
+  .menu-engineering-grid { grid-template-columns: 1fr; }
+}
+
+.me-quadrant {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.me-quadrant h4 {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.me-quadrant .desc {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-bottom: 10px;
+}
+
+.me-quadrant ul {
+  list-style: none;
+  font-size: 12px;
+}
+
+.me-quadrant li {
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+}
+
+.me-quadrant li:last-child { border-bottom: none; }
+.me-quadrant.star h4 { color: var(--green); }
+.me-quadrant.puzzle h4 { color: var(--blue); }
+.me-quadrant.plowhorse h4 { color: var(--yellow); }
+.me-quadrant.dog h4 { color: var(--red); }
+
+.help-text {
+  font-size: 12px;
+  color: var(--text-3);
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-2);
+}
+
+@media (max-width: 768px) {
+  header { padding: 12px 16px; }
+  main { padding: 16px; }
+  .summary-grid { grid-template-columns: repeat(2, 1fr); padding: 14px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">€</div>
+    <div class="brand-text">
+      Cost Manager
+      <small>Κοστολόγηση Πιάτων</small>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="restaurant-switcher" id="restSwitcher"></div>
+    <button onclick="openRestaurantModal()" title="Διαχείριση εστιατορίων" class="icon">⚙</button>
+    <button onclick="exportData()">⬇ Backup</button>
+    <button onclick="document.getElementById('importFile').click()">⬆ Restore</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-view="dashboard">Dashboard</button>
+  <button class="tab" data-view="ingredients">Πρώτες Ύλες <span class="badge" id="badge-ing">0</span></button>
+  <button class="tab" data-view="subrecipes">Sub-Recipes <span class="badge" id="badge-sub">0</span></button>
+  <button class="tab" data-view="dishes">Πιάτα <span class="badge" id="badge-dish">0</span></button>
+  <button class="tab" data-view="sales">Πωλήσεις</button>
+  <button class="tab" data-view="engineering">Menu Engineering</button>
+</nav>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <section class="view active" id="view-dashboard">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Επισκόπηση <span class="accent" id="dash-rest"></span></div>
+      </div>
+      <div class="summary-grid" id="dash-stats"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Top Πιάτα <span class="muted" style="text-transform:none;letter-spacing:0;">— ταξινομημένα κατά κερδοφορία</span></div>
+      </div>
+      <div class="table-wrap">
+        <table id="dash-top-dishes"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- INGREDIENTS -->
+  <section class="view" id="view-ingredients">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Πρώτες Ύλες</div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="search-ing" placeholder="Αναζήτηση...">
+          <button onclick="openIngredientModal()" class="primary">+ Νέα Πρώτη Ύλη</button>
+        </div>
+      </div>
+      <div class="row-info">
+        <strong>Πώς δουλεύει:</strong>
+        Καταχωρείς την τιμή αγοράς για συγκεκριμένη συσκευασία (π.χ. ντομάτα 5kg = 7.50€) και υπολογίζεται αυτόματα το κόστος ανά μονάδα (€/g, €/ml, €/τμχ). Το <em>Yield %</em> είναι η αξιοποιήσιμη ποσότητα μετά το καθάρισμα (π.χ. κρεμμύδι: yield 90% γιατί χάνεις 10% από φλούδες).
+      </div>
+      <div class="table-wrap">
+        <table id="ing-table"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUB-RECIPES -->
+  <section class="view" id="view-subrecipes">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Sub-Recipes <span class="muted" style="text-transform:none;letter-spacing:0;">— συνταγές που μπαίνουν σε πιάτα</span></div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="search-sub" placeholder="Αναζήτηση...">
+          <button onclick="openSubRecipeModal()" class="primary">+ Νέα Sub-Recipe</button>
+        </div>
+      </div>
+      <div class="row-info">
+        <strong>Παράδειγμα:</strong>
+        Φτιάχνεις σάλτσα ντομάτας 2 κιλά μία φορά. Την προσθέτεις σε 5 διαφορετικά πιάτα. Άμα αλλάξει η τιμή της ντομάτας, ενημερώνονται αυτόματα όλα τα πιάτα που περιέχουν τη σάλτσα. Καταχώρεις τη συνταγή και τη συνολική παραγόμενη ποσότητα — υπολογίζεται το κόστος ανά γραμμάριο/ml.
+      </div>
+      <div class="table-wrap">
+        <table id="sub-table"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISHES -->
+  <section class="view" id="view-dishes">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Πιάτα Καταλόγου</div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="search-dish" placeholder="Αναζήτηση...">
+          <select id="filter-cat" style="width:auto;min-width:160px;">
+            <option value="">Όλες οι κατηγορίες</option>
+          </select>
+          <button onclick="openDishModal()" class="primary">+ Νέο Πιάτο</button>
+        </div>
+      </div>
+      <div id="dish-grid" class="dish-grid"></div>
+    </div>
+  </section>
+
+  <!-- SALES -->
+  <section class="view" id="view-sales">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Πωλήσεις <span class="accent" id="sales-period"></span></div>
+        <div class="toolbar">
+          <select id="sales-period-select" style="width:auto;min-width:180px;">
+            <option value="all">Όλες οι περίοδοι</option>
+          </select>
+          <button onclick="openPeriodModal()">+ Νέα Περίοδος</button>
+        </div>
+      </div>
+      <div class="row-info">
+        <strong>Οδηγία:</strong>
+        Καταχώρησε τις πωλήσεις (πόσα τμχ από κάθε πιάτο) σε κάθε περίοδο (π.χ. "Νοέμβριος 2025"). Τα στοιχεία αυτά τροφοδοτούν το Menu Engineering.
+      </div>
+      <div class="table-wrap">
+        <table id="sales-table"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU ENGINEERING -->
+  <section class="view" id="view-engineering">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Menu Engineering <span class="accent" id="me-period"></span></div>
+        <div class="toolbar">
+          <select id="me-period-select" style="width:auto;min-width:180px;"></select>
+          <select id="me-cat-select" style="width:auto;min-width:160px;">
+            <option value="">Όλες οι κατηγορίες</option>
+          </select>
+        </div>
+      </div>
+      <div class="row-info">
+        <strong>Πώς δουλεύει η ταξινόμηση:</strong>
+        Κάθε πιάτο κατατάσσεται σε 4 κατηγορίες με βάση 2 άξονες: <strong class="green">δημοτικότητα</strong> (% πωλήσεων) και <strong class="green">περιθώριο κέρδους</strong>. Το όριο δημοτικότητας είναι 70% × (1/πλήθος_πιάτων) — βιομηχανικό πρότυπο. Το όριο κέρδους είναι ο μέσος όρος contribution margin όλων των πιάτων.
+      </div>
+      <div class="summary-grid" id="me-stats"></div>
+      <div class="menu-engineering-grid" id="me-quadrants"></div>
+      <div class="table-wrap" style="border-top:1px solid var(--border);">
+        <table id="me-table"></table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============= MODALS ============= -->
+
+<!-- Restaurant Manager Modal -->
+<div class="modal-overlay" id="restModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Διαχείριση Εστιατορίων</h3>
+      <button class="icon" onclick="closeModal('restModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="rest-list"></div>
+      <div style="margin-top:16px;display:flex;gap:8px;">
+        <input type="text" id="new-rest-name" placeholder="Όνομα νέου εστιατορίου..." style="flex:1;">
+        <button onclick="addRestaurant()" class="primary">+ Προσθήκη</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ingredient Modal -->
+<div class="modal-overlay" id="ingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="ing-modal-title">Νέα Πρώτη Ύλη</h3>
+      <button class="icon" onclick="closeModal('ingModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field">
+          <label>Όνομα</label>
+          <input type="text" id="ing-name" placeholder="π.χ. Ντομάτα">
+        </div>
+        <div class="form-grid cols-2">
+          <div class="field">
+            <label>Μονάδα Μέτρησης</label>
+            <select id="ing-unit">
+              <option value="g">Γραμμάριο (g)</option>
+              <option value="ml">Χιλιοστόλιτρο (ml)</option>
+              <option value="pcs">Τεμάχιο (τμχ)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Yield % (αξιοποιήσιμο)</label>
+            <input type="number" id="ing-yield" value="100" min="1" max="100" step="1">
+            <div class="hint">100 = όλο αξιοποιείται. 90 = χάνεις 10% στο καθάρισμα.</div>
+          </div>
+        </div>
+        <div class="form-grid cols-2">
+          <div class="field">
+            <label>Ποσότητα Συσκευασίας</label>
+            <input type="number" id="ing-pack-qty" min="0" step="0.001" placeholder="π.χ. 5000">
+            <div class="hint" id="ing-pack-hint">σε γραμμάρια</div>
+          </div>
+          <div class="field">
+            <label>Τιμή Αγοράς (€)</label>
+            <input type="number" id="ing-pack-price" min="0" step="0.01" placeholder="π.χ. 7.50">
+          </div>
+        </div>
+        <div class="cost-summary" id="ing-preview" style="display:none;">
+          <div class="cost-row"><span>Καθαρή ποσότητα μετά yield:</span><span class="accent-text" id="ing-net-qty">—</span></div>
+          <div class="cost-row total"><span>Κόστος ανά μονάδα:</span><span class="accent-text" id="ing-unit-cost">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeModal('ingModal')">Άκυρο</button>
+      <button onclick="saveIngredient()" class="primary">Αποθήκευση</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sub-Recipe Modal -->
+<div class="modal-overlay" id="subModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="sub-modal-title">Νέα Sub-Recipe</h3>
+      <button class="icon" onclick="closeModal('subModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-grid cols-2">
+          <div class="field">
+            <label>Όνομα</label>
+            <input type="text" id="sub-name" placeholder="π.χ. Σάλτσα ντομάτας">
+          </div>
+          <div class="field">
+            <label>Παραγόμενη Ποσότητα</label>
+            <div style="display:flex;gap:6px;">
+              <input type="number" id="sub-yield" min="0" step="0.001" placeholder="2000">
+              <select id="sub-unit" style="width:80px;">
+                <option value="g">g</option>
+                <option value="ml">ml</option>
+                <option value="pcs">τμχ</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="section-title">Συστατικά</div>
+        <div id="sub-ingredients"></div>
+        <button onclick="addSubIngredient()" class="tiny" style="align-self:flex-start;">+ Προσθήκη Συστατικού</button>
+        <div class="cost-summary" id="sub-preview" style="display:none;">
+          <div class="cost-row"><span>Συνολικό κόστος παρτίδας:</span><span class="accent-text" id="sub-total-cost">—</span></div>
+          <div class="cost-row total"><span>Κόστος ανά μονάδα:</span><span class="accent-text" id="sub-unit-cost">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeModal('subModal')">Άκυρο</button>
+      <button onclick="saveSubRecipe()" class="primary">Αποθήκευση</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dish Modal -->
+<div class="modal-overlay" id="dishModal">
+  <div class="modal" style="max-width:820px;">
+    <div class="modal-header">
+      <h3 id="dish-modal-title">Νέο Πιάτο</h3>
+      <div style="display:flex;gap:8px;">
+        <button onclick="printDishCard()" id="print-dish-btn" style="display:none;">🖨 Recipe Card</button>
+        <button class="icon" onclick="closeModal('dishModal')">×</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-grid cols-2">
+          <div class="field">
+            <label>Όνομα Πιάτου</label>
+            <input type="text" id="dish-name" placeholder="π.χ. Μουσακάς">
+          </div>
+          <div class="field">
+            <label>Κατηγορία</label>
+            <input type="text" id="dish-category" placeholder="π.χ. Κυρίως" list="cat-list">
+            <datalist id="cat-list"></datalist>
+          </div>
+        </div>
+        <div class="form-grid cols-2">
+          <div class="field">
+            <label>Τιμή Πώλησης (€)</label>
+            <input type="number" id="dish-price" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="field">
+            <label>ΦΠΑ %</label>
+            <input type="number" id="dish-vat" min="0" max="100" value="13" step="1">
+            <div class="hint">Εστιατόρια: 13%, ποτά: 24%</div>
+          </div>
+        </div>
+        <div class="section-title">Συστατικά &amp; Sub-Recipes</div>
+        <div id="dish-ingredients"></div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="addDishIngredient('ingredient')" class="tiny">+ Πρώτη Ύλη</button>
+          <button onclick="addDishIngredient('subrecipe')" class="tiny">+ Sub-Recipe</button>
+        </div>
+        <div class="section-title">Οδηγίες Παρασκευής (προαιρετικά)</div>
+        <textarea id="dish-instructions" rows="4" placeholder="Πώς ετοιμάζεται το πιάτο..."></textarea>
+        <div class="cost-summary" id="dish-preview">
+          <div class="cost-row"><span>Κόστος Πρώτων Υλών:</span><span class="accent-text" id="dish-cost">0,00 €</span></div>
+          <div class="cost-row"><span>Καθαρή τιμή πώλησης (χωρίς ΦΠΑ):</span><span id="dish-net-price">0,00 €</span></div>
+          <div class="cost-row"><span>Food Cost %:</span><span id="dish-food-cost">—</span></div>
+          <div class="cost-row total"><span>Contribution Margin:</span><span class="green" id="dish-margin">0,00 €</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="confirmDeleteDish()" id="dish-delete-btn" class="danger" style="display:none;">Διαγραφή</button>
+      <div style="flex:1;"></div>
+      <button onclick="closeModal('dishModal')">Άκυρο</button>
+      <button onclick="saveDish()" class="primary">Αποθήκευση</button>
+    </div>
+  </div>
+</div>
+
+<!-- Period Modal -->
+<div class="modal-overlay" id="periodModal">
+  <div class="modal small">
+    <div class="modal-header">
+      <h3>Νέα Περίοδος Πωλήσεων</h3>
+      <button class="icon" onclick="closeModal('periodModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Όνομα Περιόδου</label>
+        <input type="text" id="period-name" placeholder="π.χ. Νοέμβριος 2025">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeModal('periodModal')">Άκυρο</button>
+      <button onclick="addPeriod()" class="primary">Δημιουργία</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal small">
+    <div class="modal-header">
+      <h3>Επιβεβαίωση</h3>
+    </div>
+    <div class="modal-body">
+      <p id="confirm-text"></p>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeModal('confirmModal')">Άκυρο</button>
+      <button onclick="confirmAction()" class="primary">Συνέχεια</button>
+    </div>
+  </div>
+</div>
+
+<!-- Recipe Card Modal -->
+<div class="modal-overlay" id="recipeCardModal">
+  <div class="modal" style="background:transparent;border:none;">
+    <div style="position:absolute;top:10px;right:10px;display:flex;gap:8px;z-index:10;">
+      <button onclick="window.print()" class="primary">🖨 Εκτύπωση</button>
+      <button onclick="closeModal('recipeCardModal')" style="background:white;color:black;">Κλείσιμο</button>
+    </div>
+    <div id="recipe-card-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ============= STATE =============
+const STORAGE_KEY = 'costManager_v1';
+const UNIT_LABELS = { g: 'γραμμάριο', ml: 'χιλιοστόλιτρο', pcs: 'τεμάχιο' };
+const UNIT_SHORT = { g: 'g', ml: 'ml', pcs: 'τμχ' };
+
+let state = {
+  restaurants: [],
+  currentRest: null,
+  data: {},
+};
+
+let pendingConfirm = null;
+let editingId = null;
+let editingType = null;
+
+// ============= STORAGE =============
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) state = { ...state, ...JSON.parse(saved) };
+  } catch (e) { console.error(e); }
+
+  if (!state.restaurants || state.restaurants.length === 0) {
+    state.restaurants = [
+      { id: 'r_' + Date.now(), name: 'Εστιατόριο 1' },
+    ];
+    state.currentRest = state.restaurants[0].id;
+  }
+
+  if (!state.currentRest || !state.restaurants.find(r => r.id === state.currentRest)) {
+    state.currentRest = state.restaurants[0].id;
+  }
+
+  state.restaurants.forEach(r => {
+    if (!state.data[r.id]) {
+      state.data[r.id] = {
+        ingredients: [],
+        subrecipes: [],
+        dishes: [],
+        salesPeriods: [],
+        currentPeriod: null,
+      };
+    }
+  });
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    toast('Σφάλμα αποθήκευσης: ' + e.message, 'error');
+  }
+}
+
+const D = () => state.data[state.currentRest];
+
+// ============= HELPERS =============
+const uid = (prefix) => prefix + '_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+const fmtMoney = v => (Number(v) || 0).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+const fmtNum = (v, dec = 2) => (Number(v) || 0).toLocaleString('el-GR', { minimumFractionDigits: 0, maximumFractionDigits: dec });
+const fmtPct = v => (Number(v) || 0).toLocaleString('el-GR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+const escapeHtml = s => String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Cost calculations
+function ingredientUnitCost(ing) {
+  const packQty = Number(ing.packQty || 0);
+  const packPrice = Number(ing.packPrice || 0);
+  const yieldPct = Number(ing.yieldPct || 100) / 100;
+  if (packQty <= 0 || yieldPct <= 0) return 0;
+  return packPrice / (packQty * yieldPct);
+}
+
+// Return cost of an ingredient line (handles both ingredient and sub-recipe refs)
+function lineCost(line) {
+  const qty = Number(line.qty || 0);
+  if (qty <= 0) return 0;
+
+  if (line.type === 'ingredient') {
+    const ing = D().ingredients.find(i => i.id === line.refId);
+    if (!ing) return 0;
+    return qty * ingredientUnitCost(ing);
+  } else if (line.type === 'subrecipe') {
+    const sub = D().subrecipes.find(s => s.id === line.refId);
+    if (!sub) return 0;
+    return qty * subRecipeUnitCost(sub);
+  }
+  return 0;
+}
+
+function subRecipeTotalCost(sub) {
+  return (sub.ingredients || []).reduce((s, line) => s + lineCost(line), 0);
+}
+
+function subRecipeUnitCost(sub) {
+  const yieldQty = Number(sub.yieldQty || 0);
+  if (yieldQty <= 0) return 0;
+  return subRecipeTotalCost(sub) / yieldQty;
+}
+
+function dishCost(dish) {
+  return (dish.ingredients || []).reduce((s, line) => s + lineCost(line), 0);
+}
+
+function dishNetPrice(dish) {
+  const price = Number(dish.price || 0);
+  const vat = Number(dish.vat || 0) / 100;
+  return price / (1 + vat);
+}
+
+function dishMargin(dish) {
+  return dishNetPrice(dish) - dishCost(dish);
+}
+
+function dishFoodCostPct(dish) {
+  const net = dishNetPrice(dish);
+  if (net <= 0) return 0;
+  return (dishCost(dish) / net) * 100;
+}
+
+// ============= RESTAURANT SWITCHER =============
+function renderRestaurants() {
+  const sw = document.getElementById('restSwitcher');
+  sw.innerHTML = state.restaurants.map(r =>
+    `<button class="rest-btn ${r.id === state.currentRest ? 'active' : ''}" onclick="switchRestaurant('${r.id}')">${escapeHtml(r.name)}</button>`
+  ).join('');
+}
+
+function switchRestaurant(id) {
+  state.currentRest = id;
+  saveState();
+  renderRestaurants();
+  renderAll();
+}
+
+function openRestaurantModal() {
+  const list = document.getElementById('rest-list');
+  list.innerHTML = state.restaurants.map(r => `
+    <div style="display:flex;gap:8px;align-items:center;padding:8px;background:var(--bg-2);border-radius:6px;margin-bottom:6px;">
+      <input type="text" value="${escapeHtml(r.name)}" data-id="${r.id}" class="rest-rename" style="flex:1;">
+      <button onclick="confirmDeleteRestaurant('${r.id}')" class="danger tiny" ${state.restaurants.length <= 1 ? 'disabled style="opacity:0.3"' : ''}>Διαγραφή</button>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.rest-rename').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const r = state.restaurants.find(x => x.id === e.target.dataset.id);
+      if (r) {
+        r.name = e.target.value.trim() || 'Χωρίς όνομα';
+        saveState();
+        renderRestaurants();
+        renderAll();
+      }
+    });
+  });
+
+  openModal('restModal');
+}
+
+function addRestaurant() {
+  const name = document.getElementById('new-rest-name').value.trim();
+  if (!name) { toast('Δώσε όνομα εστιατορίου', 'error'); return; }
+  const id = uid('r');
+  state.restaurants.push({ id, name });
+  state.data[id] = { ingredients: [], subrecipes: [], dishes: [], salesPeriods: [], currentPeriod: null };
+  saveState();
+  document.getElementById('new-rest-name').value = '';
+  openRestaurantModal();
+  renderRestaurants();
+  toast('Εστιατόριο προστέθηκε', 'success');
+}
+
+function confirmDeleteRestaurant(id) {
+  if (state.restaurants.length <= 1) { toast('Πρέπει να υπάρχει τουλάχιστον 1 εστιατόριο', 'error'); return; }
+  const r = state.restaurants.find(x => x.id === id);
+  confirmAction_(`Διαγραφή "${r.name}"; Θα χαθούν όλες οι πρώτες ύλες, sub-recipes, πιάτα και πωλήσεις.`, () => {
+    state.restaurants = state.restaurants.filter(x => x.id !== id);
+    delete state.data[id];
+    if (state.currentRest === id) state.currentRest = state.restaurants[0].id;
+    saveState();
+    closeModal('restModal');
+    renderRestaurants();
+    renderAll();
+    toast('Εστιατόριο διαγράφηκε', 'success');
+  });
+}
+
+// ============= INGREDIENTS =============
+function renderIngredients() {
+  const search = (document.getElementById('search-ing').value || '').toLowerCase();
+  const list = D().ingredients.filter(i => !search || i.name.toLowerCase().includes(search));
+  const t = document.getElementById('ing-table');
+  let html = '<thead><tr><th>Όνομα</th><th class="num">Συσκευασία</th><th class="num">Τιμή</th><th class="num">Yield</th><th class="num">Κόστος / μονάδα</th><th class="center">Ενέργειες</th></tr></thead><tbody>';
+
+  if (list.length === 0) {
+    html += `<tr><td colspan="6" class="empty"><div class="empty-icon">🥕</div>${search ? 'Δεν βρέθηκαν αποτελέσματα' : 'Δεν υπάρχουν πρώτες ύλες ακόμη'}</td></tr>`;
+  } else {
+    list.forEach(ing => {
+      const unit = UNIT_SHORT[ing.unit] || ing.unit;
+      html += `<tr>
+        <td><strong>${escapeHtml(ing.name)}</strong></td>
+        <td class="num">${fmtNum(ing.packQty, 3)} ${unit}</td>
+        <td class="num">${fmtMoney(ing.packPrice)}</td>
+        <td class="num">${ing.yieldPct}%</td>
+        <td class="num accent-text"><strong>${fmtMoney(ingredientUnitCost(ing))}</strong>/${unit}</td>
+        <td class="center" style="white-space:nowrap;">
+          <button onclick="editIngredient('${ing.id}')" class="tiny">✎</button>
+          <button onclick="confirmDeleteIngredient('${ing.id}')" class="tiny danger">×</button>
+        </td>
+      </tr>`;
+    });
+  }
+  html += '</tbody>';
+  t.innerHTML = html;
+  document.getElementById('badge-ing').textContent = D().ingredients.length;
+}
+
+function openIngredientModal(id) {
+  editingId = id || null;
+  editingType = 'ingredient';
+  document.getElementById('ing-modal-title').textContent = id ? 'Επεξεργασία Πρώτης Ύλης' : 'Νέα Πρώτη Ύλη';
+
+  if (id) {
+    const ing = D().ingredients.find(i => i.id === id);
+    document.getElementById('ing-name').value = ing.name;
+    document.getElementById('ing-unit').value = ing.unit;
+    document.getElementById('ing-yield').value = ing.yieldPct;
+    document.getElementById('ing-pack-qty').value = ing.packQty;
+    document.getElementById('ing-pack-price').value = ing.packPrice;
+  } else {
+    document.getElementById('ing-name').value = '';
+    document.getElementById('ing-unit').value = 'g';
+    document.getElementById('ing-yield').value = 100;
+    document.getElementById('ing-pack-qty').value = '';
+    document.getElementById('ing-pack-price').value = '';
+  }
+  updateIngPreview();
+  openModal('ingModal');
+  setTimeout(() => document.getElementById('ing-name').focus(), 50);
+}
+
+function editIngredient(id) { openIngredientModal(id); }
+
+function updateIngPreview() {
+  const unit = document.getElementById('ing-unit').value;
+  const qty = parseFloat(document.getElementById('ing-pack-qty').value) || 0;
+  const price = parseFloat(document.getElementById('ing-pack-price').value) || 0;
+  const yPct = parseFloat(document.getElementById('ing-yield').value) || 100;
+  const hint = document.getElementById('ing-pack-hint');
+
+  if (unit === 'g') hint.textContent = 'σε γραμμάρια (π.χ. 5000 για 5 κιλά)';
+  else if (unit === 'ml') hint.textContent = 'σε ml (π.χ. 1000 για 1 λίτρο)';
+  else hint.textContent = 'πλήθος τεμαχίων';
+
+  const preview = document.getElementById('ing-preview');
+  if (qty > 0 && price > 0) {
+    const netQty = qty * (yPct / 100);
+    const cost = price / netQty;
+    document.getElementById('ing-net-qty').textContent = fmtNum(netQty, 2) + ' ' + UNIT_SHORT[unit];
+    document.getElementById('ing-unit-cost').textContent = fmtMoney(cost) + ' / ' + UNIT_SHORT[unit];
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+['ing-name', 'ing-unit', 'ing-yield', 'ing-pack-qty', 'ing-pack-price'].forEach(id => {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById(id).addEventListener('input', updateIngPreview);
+  });
+});
+
+function saveIngredient() {
+  const name = document.getElementById('ing-name').value.trim();
+  if (!name) { toast('Δώσε όνομα', 'error'); return; }
+  const data = {
+    name,
+    unit: document.getElementById('ing-unit').value,
+    yieldPct: Math.max(1, Math.min(100, parseFloat(document.getElementById('ing-yield').value) || 100)),
+    packQty: parseFloat(document.getElementById('ing-pack-qty').value) || 0,
+    packPrice: parseFloat(document.getElementById('ing-pack-price').value) || 0,
+  };
+  if (data.packQty <= 0 || data.packPrice <= 0) { toast('Συμπλήρωσε ποσότητα και τιμή', 'error'); return; }
+
+  if (editingId) {
+    const ing = D().ingredients.find(i => i.id === editingId);
+    Object.assign(ing, data);
+    toast('Πρώτη ύλη ενημερώθηκε', 'success');
+  } else {
+    D().ingredients.push({ id: uid('ing'), ...data });
+    toast('Πρώτη ύλη προστέθηκε', 'success');
+  }
+  saveState();
+  closeModal('ingModal');
+  renderAll();
+}
+
+function confirmDeleteIngredient(id) {
+  const ing = D().ingredients.find(i => i.id === id);
+  // Check usage
+  const usedInSubs = D().subrecipes.filter(s => (s.ingredients || []).some(l => l.type === 'ingredient' && l.refId === id));
+  const usedInDishes = D().dishes.filter(d => (d.ingredients || []).some(l => l.type === 'ingredient' && l.refId === id));
+  let msg = `Διαγραφή "${ing.name}";`;
+  if (usedInSubs.length || usedInDishes.length) {
+    msg += `\n\nΠΡΟΣΟΧΗ: Χρησιμοποιείται σε ${usedInSubs.length} sub-recipes και ${usedInDishes.length} πιάτα. Θα αφαιρεθεί από όλα.`;
+  }
+  confirmAction_(msg, () => {
+    D().subrecipes.forEach(s => { s.ingredients = (s.ingredients || []).filter(l => !(l.type === 'ingredient' && l.refId === id)); });
+    D().dishes.forEach(d => { d.ingredients = (d.ingredients || []).filter(l => !(l.type === 'ingredient' && l.refId === id)); });
+    D().ingredients = D().ingredients.filter(i => i.id !== id);
+    saveState();
+    renderAll();
+    toast('Πρώτη ύλη διαγράφηκε', 'success');
+  });
+}
+
+// ============= SUB-RECIPES =============
+function renderSubRecipes() {
+  const search = (document.getElementById('search-sub').value || '').toLowerCase();
+  const list = D().subrecipes.filter(s => !search || s.name.toLowerCase().includes(search));
+  const t = document.getElementById('sub-table');
+  let html = '<thead><tr><th>Όνομα</th><th class="num">Παραγωγή</th><th class="num">Συστατικά</th><th class="num">Συνολικό Κόστος</th><th class="num">Κόστος / μονάδα</th><th class="center">Ενέργειες</th></tr></thead><tbody>';
+
+  if (list.length === 0) {
+    html += `<tr><td colspan="6" class="empty"><div class="empty-icon">🥣</div>${search ? 'Δεν βρέθηκαν αποτελέσματα' : 'Δεν υπάρχουν sub-recipes ακόμη'}</td></tr>`;
+  } else {
+    list.forEach(sub => {
+      const unit = UNIT_SHORT[sub.unit] || sub.unit;
+      html += `<tr>
+        <td><strong>${escapeHtml(sub.name)}</strong></td>
+        <td class="num">${fmtNum(sub.yieldQty, 2)} ${unit}</td>
+        <td class="num">${(sub.ingredients || []).length}</td>
+        <td class="num">${fmtMoney(subRecipeTotalCost(sub))}</td>
+        <td class="num accent-text"><strong>${fmtMoney(subRecipeUnitCost(sub))}</strong>/${unit}</td>
+        <td class="center" style="white-space:nowrap;">
+          <button onclick="editSubRecipe('${sub.id}')" class="tiny">✎</button>
+          <button onclick="confirmDeleteSubRecipe('${sub.id}')" class="tiny danger">×</button>
+        </td>
+      </tr>`;
+    });
+  }
+  html += '</tbody>';
+  t.innerHTML = html;
+  document.getElementById('badge-sub').textContent = D().subrecipes.length;
+}
+
+let subTempIngredients = [];
+
+function openSubRecipeModal(id) {
+  editingId = id || null;
+  editingType = 'subrecipe';
+  document.getElementById('sub-modal-title').textContent = id ? 'Επεξεργασία Sub-Recipe' : 'Νέα Sub-Recipe';
+
+  if (id) {
+    const sub = D().subrecipes.find(s => s.id === id);
+    document.getElementById('sub-name').value = sub.name;
+    document.getElementById('sub-yield').value = sub.yieldQty;
+    document.getElementById('sub-unit').value = sub.unit;
+    subTempIngredients = JSON.parse(JSON.stringify(sub.ingredients || []));
+  } else {
+    document.getElementById('sub-name').value = '';
+    document.getElementById('sub-yield').value = '';
+    document.getElementById('sub-unit').value = 'g';
+    subTempIngredients = [];
+  }
+  renderSubIngredients();
+  openModal('subModal');
+}
+
+function editSubRecipe(id) { openSubRecipeModal(id); }
+
+function renderSubIngredients() {
+  const c = document.getElementById('sub-ingredients');
+  if (subTempIngredients.length === 0) {
+    c.innerHTML = '<div class="muted" style="text-align:center;padding:14px;font-size:12px;">Πρόσθεσε συστατικά παρακάτω</div>';
+  } else {
+    c.innerHTML = subTempIngredients.map((line, idx) => {
+      const ingOptions = D().ingredients.map(i =>
+        `<option value="${i.id}" ${line.refId === i.id ? 'selected' : ''}>${escapeHtml(i.name)} (${UNIT_SHORT[i.unit]})</option>`
+      ).join('');
+      const ing = D().ingredients.find(i => i.id === line.refId);
+      const unit = ing ? UNIT_SHORT[ing.unit] : '';
+      const cost = lineCost(line);
+      return `<div class="ingredient-row">
+        <select onchange="updateSubLine(${idx}, 'refId', this.value)"><option value="">— Επιλογή —</option>${ingOptions}</select>
+        <input type="number" class="tight" min="0" step="0.001" value="${line.qty || ''}" placeholder="Ποσότητα" onchange="updateSubLine(${idx}, 'qty', this.value)">
+        <span class="muted qty-unit" style="font-size:12px;">${unit}</span>
+        <span class="accent-text" style="font-size:12px;text-align:right;">${fmtMoney(cost)}</span>
+        <button onclick="removeSubLine(${idx})" class="tiny danger icon">×</button>
+      </div>`;
+    }).join('');
+  }
+  updateSubPreview();
+}
+
+function addSubIngredient() {
+  if (D().ingredients.length === 0) { toast('Πρόσθεσε πρώτα κάποια πρώτη ύλη', 'error'); return; }
+  subTempIngredients.push({ type: 'ingredient', refId: '', qty: 0 });
+  renderSubIngredients();
+}
+
+function updateSubLine(idx, field, value) {
+  if (field === 'qty') subTempIngredients[idx].qty = parseFloat(value) || 0;
+  else subTempIngredients[idx][field] = value;
+  renderSubIngredients();
+}
+
+function removeSubLine(idx) {
+  subTempIngredients.splice(idx, 1);
+  renderSubIngredients();
+}
+
+function updateSubPreview() {
+  const yQty = parseFloat(document.getElementById('sub-yield').value) || 0;
+  const unit = document.getElementById('sub-unit').value;
+  const totalCost = subTempIngredients.reduce((s, l) => s + lineCost(l), 0);
+  const preview = document.getElementById('sub-preview');
+  if (totalCost > 0) {
+    document.getElementById('sub-total-cost').textContent = fmtMoney(totalCost);
+    if (yQty > 0) {
+      document.getElementById('sub-unit-cost').textContent = fmtMoney(totalCost / yQty) + ' / ' + UNIT_SHORT[unit];
+    } else {
+      document.getElementById('sub-unit-cost').textContent = '— (συμπλήρωσε παραγωγή)';
+    }
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('sub-yield').addEventListener('input', updateSubPreview);
+  document.getElementById('sub-unit').addEventListener('change', updateSubPreview);
+});
+
+function saveSubRecipe() {
+  const name = document.getElementById('sub-name').value.trim();
+  if (!name) { toast('Δώσε όνομα', 'error'); return; }
+  const yieldQty = parseFloat(document.getElementById('sub-yield').value) || 0;
+  if (yieldQty <= 0) { toast('Συμπλήρωσε παραγόμενη ποσότητα', 'error'); return; }
+  const validLines = subTempIngredients.filter(l => l.refId && l.qty > 0);
+  if (validLines.length === 0) { toast('Πρόσθεσε τουλάχιστον ένα συστατικό', 'error'); return; }
+
+  const data = {
+    name,
+    yieldQty,
+    unit: document.getElementById('sub-unit').value,
+    ingredients: validLines,
+  };
+
+  if (editingId) {
+    const sub = D().subrecipes.find(s => s.id === editingId);
+    Object.assign(sub, data);
+    toast('Sub-recipe ενημερώθηκε', 'success');
+  } else {
+    D().subrecipes.push({ id: uid('sub'), ...data });
+    toast('Sub-recipe προστέθηκε', 'success');
+  }
+  saveState();
+  closeModal('subModal');
+  renderAll();
+}
+
+function confirmDeleteSubRecipe(id) {
+  const sub = D().subrecipes.find(s => s.id === id);
+  const usedInDishes = D().dishes.filter(d => (d.ingredients || []).some(l => l.type === 'subrecipe' && l.refId === id));
+  let msg = `Διαγραφή "${sub.name}";`;
+  if (usedInDishes.length) msg += `\n\nΧρησιμοποιείται σε ${usedInDishes.length} πιάτα — θα αφαιρεθεί από όλα.`;
+  confirmAction_(msg, () => {
+    D().dishes.forEach(d => { d.ingredients = (d.ingredients || []).filter(l => !(l.type === 'subrecipe' && l.refId === id)); });
+    D().subrecipes = D().subrecipes.filter(s => s.id !== id);
+    saveState();
+    renderAll();
+    toast('Sub-recipe διαγράφηκε', 'success');
+  });
+}
+
+// ============= DISHES =============
+function renderDishes() {
+  const search = (document.getElementById('search-dish').value || '').toLowerCase();
+  const filterCat = document.getElementById('filter-cat').value;
+
+  let list = D().dishes;
+  if (search) list = list.filter(d => d.name.toLowerCase().includes(search));
+  if (filterCat) list = list.filter(d => d.category === filterCat);
+
+  // Update category filter options
+  const cats = [...new Set(D().dishes.map(d => d.category).filter(Boolean))].sort();
+  const filterCatSel = document.getElementById('filter-cat');
+  const currentVal = filterCatSel.value;
+  filterCatSel.innerHTML = '<option value="">Όλες οι κατηγορίες</option>' +
+    cats.map(c => `<option value="${escapeHtml(c)}" ${c === currentVal ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('');
+  document.getElementById('cat-list').innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
+
+  const grid = document.getElementById('dish-grid');
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">🍽</div>${search || filterCat ? 'Δεν βρέθηκαν πιάτα' : 'Δεν υπάρχουν πιάτα ακόμη'}</div>`;
+  } else {
+    grid.innerHTML = list.map(d => {
+      const cost = dishCost(d);
+      const margin = dishMargin(d);
+      const fc = dishFoodCostPct(d);
+      const fcColor = fc <= 30 ? 'green' : fc <= 35 ? 'yellow' : 'red';
+      return `<div class="dish-card" onclick="editDish('${d.id}')">
+        <div class="dish-card-title">${escapeHtml(d.name)}</div>
+        <div class="dish-card-meta">
+          ${d.category ? `<span class="tag cat">${escapeHtml(d.category)}</span>` : ''}
+          <span class="muted">${(d.ingredients || []).length} συστατικά</span>
+        </div>
+        <div class="dish-card-stats">
+          <div>
+            <div class="dish-card-stat-label">Κόστος</div>
+            <div class="dish-card-stat-value">${fmtMoney(cost)}</div>
+          </div>
+          <div>
+            <div class="dish-card-stat-label">Τιμή Πώλησης</div>
+            <div class="dish-card-stat-value">${fmtMoney(d.price || 0)}</div>
+          </div>
+          <div>
+            <div class="dish-card-stat-label">Food Cost</div>
+            <div class="dish-card-stat-value ${fcColor}">${d.price > 0 ? fmtPct(fc) : '—'}</div>
+          </div>
+          <div>
+            <div class="dish-card-stat-label">Κέρδος</div>
+            <div class="dish-card-stat-value green">${fmtMoney(margin)}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('badge-dish').textContent = D().dishes.length;
+}
+
+let dishTempIngredients = [];
+
+function openDishModal(id) {
+  editingId = id || null;
+  editingType = 'dish';
+  document.getElementById('dish-modal-title').textContent = id ? 'Επεξεργασία Πιάτου' : 'Νέο Πιάτο';
+  document.getElementById('dish-delete-btn').style.display = id ? '' : 'none';
+  document.getElementById('print-dish-btn').style.display = id ? '' : 'none';
+
+  // Update category datalist
+  const cats = [...new Set(D().dishes.map(d => d.category).filter(Boolean))].sort();
+  document.getElementById('cat-list').innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
+
+  if (id) {
+    const dish = D().dishes.find(d => d.id === id);
+    document.getElementById('dish-name').value = dish.name;
+    document.getElementById('dish-category').value = dish.category || '';
+    document.getElementById('dish-price').value = dish.price || '';
+    document.getElementById('dish-vat').value = dish.vat || 13;
+    document.getElementById('dish-instructions').value = dish.instructions || '';
+    dishTempIngredients = JSON.parse(JSON.stringify(dish.ingredients || []));
+  } else {
+    document.getElementById('dish-name').value = '';
+    document.getElementById('dish-category').value = '';
+    document.getElementById('dish-price').value = '';
+    document.getElementById('dish-vat').value = 13;
+    document.getElementById('dish-instructions').value = '';
+    dishTempIngredients = [];
+  }
+  renderDishIngredients();
+  openModal('dishModal');
+}
+
+function editDish(id) { openDishModal(id); }
+
+function renderDishIngredients() {
+  const c = document.getElementById('dish-ingredients');
+  if (dishTempIngredients.length === 0) {
+    c.innerHTML = '<div class="muted" style="text-align:center;padding:14px;font-size:12px;">Πρόσθεσε συστατικά παρακάτω</div>';
+  } else {
+    c.innerHTML = dishTempIngredients.map((line, idx) => {
+      let options = '';
+      if (line.type === 'ingredient') {
+        options = D().ingredients.map(i => `<option value="${i.id}" ${line.refId === i.id ? 'selected' : ''}>${escapeHtml(i.name)} (${UNIT_SHORT[i.unit]})</option>`).join('');
+      } else {
+        options = D().subrecipes.map(s => `<option value="${s.id}" ${line.refId === s.id ? 'selected' : ''}>${escapeHtml(s.name)} (${UNIT_SHORT[s.unit]})</option>`).join('');
+      }
+      const ref = line.type === 'ingredient'
+        ? D().ingredients.find(i => i.id === line.refId)
+        : D().subrecipes.find(s => s.id === line.refId);
+      const unit = ref ? UNIT_SHORT[ref.unit] : '';
+      const cost = lineCost(line);
+      const tag = line.type === 'subrecipe' ? '<span class="tag subrecipe" style="font-size:9px;">SUB</span> ' : '';
+      return `<div class="ingredient-row">
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${tag}
+          <select onchange="updateDishLine(${idx}, 'refId', this.value)" style="flex:1;"><option value="">— Επιλογή —</option>${options}</select>
+        </div>
+        <input type="number" class="tight" min="0" step="0.001" value="${line.qty || ''}" placeholder="Ποσότητα" onchange="updateDishLine(${idx}, 'qty', this.value)">
+        <span class="muted qty-unit" style="font-size:12px;">${unit}</span>
+        <span class="accent-text" style="font-size:12px;text-align:right;">${fmtMoney(cost)}</span>
+        <button onclick="removeDishLine(${idx})" class="tiny danger icon">×</button>
+      </div>`;
+    }).join('');
+  }
+  updateDishPreview();
+}
+
+function addDishIngredient(type) {
+  if (type === 'ingredient' && D().ingredients.length === 0) { toast('Πρόσθεσε πρώτα κάποια πρώτη ύλη', 'error'); return; }
+  if (type === 'subrecipe' && D().subrecipes.length === 0) { toast('Πρόσθεσε πρώτα κάποια sub-recipe', 'error'); return; }
+  dishTempIngredients.push({ type, refId: '', qty: 0 });
+  renderDishIngredients();
+}
+
+function updateDishLine(idx, field, value) {
+  if (field === 'qty') dishTempIngredients[idx].qty = parseFloat(value) || 0;
+  else dishTempIngredients[idx][field] = value;
+  renderDishIngredients();
+}
+
+function removeDishLine(idx) {
+  dishTempIngredients.splice(idx, 1);
+  renderDishIngredients();
+}
+
+function updateDishPreview() {
+  const cost = dishTempIngredients.reduce((s, l) => s + lineCost(l), 0);
+  const price = parseFloat(document.getElementById('dish-price').value) || 0;
+  const vat = parseFloat(document.getElementById('dish-vat').value) || 0;
+  const netPrice = price / (1 + vat / 100);
+  const margin = netPrice - cost;
+  const fc = netPrice > 0 ? (cost / netPrice) * 100 : 0;
+
+  document.getElementById('dish-cost').textContent = fmtMoney(cost);
+  document.getElementById('dish-net-price').textContent = fmtMoney(netPrice);
+  document.getElementById('dish-food-cost').textContent = price > 0 ? fmtPct(fc) : '—';
+  const marginEl = document.getElementById('dish-margin');
+  marginEl.textContent = fmtMoney(margin);
+  marginEl.className = margin >= 0 ? 'green' : 'red';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('dish-price').addEventListener('input', updateDishPreview);
+  document.getElementById('dish-vat').addEventListener('input', updateDishPreview);
+});
+
+function saveDish() {
+  const name = document.getElementById('dish-name').value.trim();
+  if (!name) { toast('Δώσε όνομα πιάτου', 'error'); return; }
+  const validLines = dishTempIngredients.filter(l => l.refId && l.qty > 0);
+
+  const data = {
+    name,
+    category: document.getElementById('dish-category').value.trim(),
+    price: parseFloat(document.getElementById('dish-price').value) || 0,
+    vat: parseFloat(document.getElementById('dish-vat').value) || 13,
+    instructions: document.getElementById('dish-instructions').value.trim(),
+    ingredients: validLines,
+  };
+
+  if (editingId) {
+    const dish = D().dishes.find(d => d.id === editingId);
+    Object.assign(dish, data);
+    toast('Πιάτο ενημερώθηκε', 'success');
+  } else {
+    D().dishes.push({ id: uid('dish'), ...data });
+    toast('Πιάτο προστέθηκε', 'success');
+  }
+  saveState();
+  closeModal('dishModal');
+  renderAll();
+}
+
+function confirmDeleteDish() {
+  if (!editingId) return;
+  const dish = D().dishes.find(d => d.id === editingId);
+  confirmAction_(`Διαγραφή "${dish.name}";`, () => {
+    D().dishes = D().dishes.filter(d => d.id !== editingId);
+    // Also clean from sales
+    D().salesPeriods.forEach(p => { delete p.sales[editingId]; });
+    saveState();
+    closeModal('dishModal');
+    renderAll();
+    toast('Πιάτο διαγράφηκε', 'success');
+  });
+}
+
+// Recipe Card (printable)
+function printDishCard() {
+  if (!editingId) return;
+  const dish = D().dishes.find(d => d.id === editingId);
+  const rest = state.restaurants.find(r => r.id === state.currentRest);
+  const cost = dishCost(dish);
+  const lines = (dish.ingredients || []).map(l => {
+    const ref = l.type === 'ingredient'
+      ? D().ingredients.find(i => i.id === l.refId)
+      : D().subrecipes.find(s => s.id === l.refId);
+    if (!ref) return null;
+    const unit = UNIT_SHORT[ref.unit];
+    return `<div><span class="qty">${fmtNum(l.qty, 2)} ${unit}</span> ${escapeHtml(ref.name)}${l.type === 'subrecipe' ? ' <em>(sub-recipe)</em>' : ''}</div>`;
+  }).filter(Boolean).join('');
+
+  document.getElementById('recipe-card-content').innerHTML = `
+    <div class="recipe-card">
+      <h1>${escapeHtml(dish.name)}</h1>
+      <div class="meta">
+        ${dish.category ? `<span><strong>Κατηγορία:</strong> ${escapeHtml(dish.category)}</span>` : ''}
+        <span><strong>Εστιατόριο:</strong> ${escapeHtml(rest.name)}</span>
+      </div>
+      <h2>Συστατικά</h2>
+      <div class="ingr-list">${lines || '<div><em>Χωρίς συστατικά</em></div>'}</div>
+      ${dish.instructions ? `<h2>Εκτέλεση</h2><div class="instructions">${escapeHtml(dish.instructions)}</div>` : ''}
+      <div class="footer">
+        <span>Κόστος Πρώτων Υλών: ${fmtMoney(cost)}</span>
+        <span>Τιμή Πώλησης: ${fmtMoney(dish.price || 0)}</span>
+      </div>
+    </div>
+  `;
+  openModal('recipeCardModal');
+}
+
+// ============= SALES =============
+function renderSalesPeriodSelects() {
+  const periods = D().salesPeriods;
+  const sel1 = document.getElementById('sales-period-select');
+  const sel2 = document.getElementById('me-period-select');
+
+  const opts = '<option value="">— Επιλογή περιόδου —</option>' +
+    periods.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+
+  sel1.innerHTML = '<option value="all">Όλες οι περίοδοι (συγκεντρωτικά)</option>' +
+    periods.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+  sel2.innerHTML = opts;
+
+  if (D().currentPeriod) {
+    sel1.value = D().currentPeriod;
+    sel2.value = D().currentPeriod;
+  }
+}
+
+function renderSales() {
+  const sel = document.getElementById('sales-period-select');
+  const periodId = sel.value;
+  const t = document.getElementById('sales-table');
+  const periods = D().salesPeriods;
+
+  if (D().dishes.length === 0) {
+    t.innerHTML = `<thead></thead><tbody><tr><td class="empty"><div class="empty-icon">🧾</div>Δεν υπάρχουν πιάτα. Πρόσθεσε πρώτα πιάτα.</td></tr></tbody>`;
+    return;
+  }
+
+  if (periods.length === 0) {
+    t.innerHTML = `<thead></thead><tbody><tr><td class="empty"><div class="empty-icon">📅</div>Δεν υπάρχουν περίοδοι. Δημιούργησε μία.</td></tr></tbody>`;
+    return;
+  }
+
+  let html = '<thead><tr><th>Πιάτο</th><th>Κατηγορία</th><th class="num">Τιμή</th><th class="num">Κόστος</th><th class="num">Πωλήσεις (τμχ)</th><th class="num">Έσοδα</th><th class="num">Κέρδος</th></tr></thead><tbody>';
+
+  D().dishes.forEach(dish => {
+    let qty = 0;
+    if (periodId === 'all' || !periodId) {
+      qty = periods.reduce((s, p) => s + (Number(p.sales?.[dish.id]) || 0), 0);
+    } else {
+      const p = periods.find(x => x.id === periodId);
+      qty = Number(p?.sales?.[dish.id]) || 0;
+    }
+    const cost = dishCost(dish);
+    const margin = dishMargin(dish);
+    const revenue = qty * (dish.price || 0);
+    const profit = qty * margin;
+
+    const inputDisabled = (periodId === 'all' || !periodId);
+    html += `<tr>
+      <td><strong>${escapeHtml(dish.name)}</strong></td>
+      <td>${dish.category ? `<span class="tag cat">${escapeHtml(dish.category)}</span>` : '<span class="muted">—</span>'}</td>
+      <td class="num">${fmtMoney(dish.price || 0)}</td>
+      <td class="num">${fmtMoney(cost)}</td>
+      <td class="num">${inputDisabled ? `<strong>${qty}</strong>` : `<input type="number" class="tight" min="0" step="1" value="${qty || ''}" data-dish="${dish.id}" data-period="${periodId}" style="max-width:100px;text-align:right;">`}</td>
+      <td class="num">${fmtMoney(revenue)}</td>
+      <td class="num green"><strong>${fmtMoney(profit)}</strong></td>
+    </tr>`;
+  });
+
+  // Totals row
+  let totalQty = 0, totalRev = 0, totalProfit = 0;
+  D().dishes.forEach(dish => {
+    let qty = 0;
+    if (periodId === 'all' || !periodId) {
+      qty = periods.reduce((s, p) => s + (Number(p.sales?.[dish.id]) || 0), 0);
+    } else {
+      const p = periods.find(x => x.id === periodId);
+      qty = Number(p?.sales?.[dish.id]) || 0;
+    }
+    totalQty += qty;
+    totalRev += qty * (dish.price || 0);
+    totalProfit += qty * dishMargin(dish);
+  });
+
+  html += `<tr style="background:var(--bg-3);font-weight:700;">
+    <td colspan="4">ΣΥΝΟΛΑ</td>
+    <td class="num">${totalQty}</td>
+    <td class="num accent-text">${fmtMoney(totalRev)}</td>
+    <td class="num green">${fmtMoney(totalProfit)}</td>
+  </tr>`;
+
+  html += '</tbody>';
+  t.innerHTML = html;
+
+  // Bind sales inputs
+  t.querySelectorAll('input[data-dish]').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const dishId = e.target.dataset.dish;
+      const pId = e.target.dataset.period;
+      const p = D().salesPeriods.find(x => x.id === pId);
+      if (!p) return;
+      if (!p.sales) p.sales = {};
+      const val = parseInt(e.target.value) || 0;
+      if (val > 0) p.sales[dishId] = val;
+      else delete p.sales[dishId];
+      saveState();
+      renderSales();
+      renderDashboard();
+    });
+  });
+
+  // Update period label
+  let label = '';
+  if (periodId === 'all' || !periodId) label = '— Όλες οι περίοδοι';
+  else {
+    const p = periods.find(x => x.id === periodId);
+    label = p ? `— ${p.name}` : '';
+  }
+  document.getElementById('sales-period').textContent = label;
+}
+
+function openPeriodModal() {
+  document.getElementById('period-name').value = '';
+  openModal('periodModal');
+  setTimeout(() => document.getElementById('period-name').focus(), 50);
+}
+
+function addPeriod() {
+  const name = document.getElementById('period-name').value.trim();
+  if (!name) { toast('Δώσε όνομα', 'error'); return; }
+  const id = uid('p');
+  D().salesPeriods.push({ id, name, sales: {} });
+  D().currentPeriod = id;
+  saveState();
+  closeModal('periodModal');
+  renderAll();
+  document.getElementById('sales-period-select').value = id;
+  renderSales();
+  toast('Περίοδος προστέθηκε', 'success');
+}
+
+// ============= MENU ENGINEERING =============
+function renderMenuEngineering() {
+  const sel = document.getElementById('me-period-select');
+  const catSel = document.getElementById('me-cat-select');
+
+  // Update category options
+  const cats = [...new Set(D().dishes.map(d => d.category).filter(Boolean))].sort();
+  const catVal = catSel.value;
+  catSel.innerHTML = '<option value="">Όλες οι κατηγορίες</option>' +
+    cats.map(c => `<option value="${escapeHtml(c)}" ${c === catVal ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('');
+
+  const periodId = sel.value;
+  const period = D().salesPeriods.find(p => p.id === periodId);
+
+  document.getElementById('me-period').textContent = period ? `— ${period.name}` : '— επιλέξτε περίοδο';
+
+  const statsEl = document.getElementById('me-stats');
+  const quadrantsEl = document.getElementById('me-quadrants');
+  const tableEl = document.getElementById('me-table');
+
+  if (!period) {
+    statsEl.innerHTML = '';
+    quadrantsEl.innerHTML = '';
+    tableEl.innerHTML = `<thead></thead><tbody><tr><td class="empty"><div class="empty-icon">📊</div>Επίλεξε περίοδο πωλήσεων για να δεις την ανάλυση menu engineering.</td></tr></tbody>`;
+    return;
+  }
+
+  // Filter dishes
+  let dishes = D().dishes;
+  if (catSel.value) dishes = dishes.filter(d => d.category === catSel.value);
+
+  // Calculate metrics
+  const items = dishes.map(d => {
+    const qty = Number(period.sales?.[d.id]) || 0;
+    const margin = dishMargin(d);
+    return { dish: d, qty, margin, totalProfit: qty * margin };
+  }).filter(x => x.qty > 0 || dishes.length <= 20); // include zero-sales if few dishes
+
+  const totalQty = items.reduce((s, x) => s + x.qty, 0);
+  if (totalQty === 0) {
+    statsEl.innerHTML = '';
+    quadrantsEl.innerHTML = '';
+    tableEl.innerHTML = `<thead></thead><tbody><tr><td class="empty"><div class="empty-icon">📊</div>Δεν υπάρχουν πωλήσεις σε αυτή την περίοδο. Πρόσθεσε στοιχεία πωλήσεων.</td></tr></tbody>`;
+    return;
+  }
+
+  // Popularity threshold: 70% × (1 / count)
+  const popThreshold = (0.7 / items.length) * 100; // as %
+  // Margin threshold: average margin
+  const avgMargin = items.reduce((s, x) => s + x.margin, 0) / items.length;
+
+  items.forEach(x => {
+    x.popularityPct = (x.qty / totalQty) * 100;
+    x.isPopular = x.popularityPct >= popThreshold;
+    x.isProfitable = x.margin >= avgMargin;
+    if (x.isPopular && x.isProfitable) x.classification = 'star';
+    else if (!x.isPopular && x.isProfitable) x.classification = 'puzzle';
+    else if (x.isPopular && !x.isProfitable) x.classification = 'plowhorse';
+    else x.classification = 'dog';
+  });
+
+  // Stats
+  const totalRev = items.reduce((s, x) => s + x.qty * (x.dish.price || 0), 0);
+  const totalProfit = items.reduce((s, x) => s + x.totalProfit, 0);
+  const avgFC = items.reduce((s, x) => s + dishFoodCostPct(x.dish), 0) / items.length;
+
+  statsEl.innerHTML = `
+    <div class="stat-card"><div class="stat-label">Σύνολο Πωλήσεων</div><div class="stat-value accent-text">${totalQty}</div><div class="stat-sub">τμχ</div></div>
+    <div class="stat-card green"><div class="stat-label">Έσοδα</div><div class="stat-value">${fmtMoney(totalRev)}</div></div>
+    <div class="stat-card green"><div class="stat-label">Συν. Κέρδος</div><div class="stat-value green">${fmtMoney(totalProfit)}</div></div>
+    <div class="stat-card blue"><div class="stat-label">Μέσο Food Cost</div><div class="stat-value blue">${fmtPct(avgFC)}</div></div>
+  `;
+
+  // Quadrants
+  const groupBy = (cls, label, desc) => {
+    const its = items.filter(x => x.classification === cls).sort((a, b) => b.totalProfit - a.totalProfit);
+    return `<div class="me-quadrant ${cls}">
+      <h4>${label}</h4>
+      <div class="desc">${desc}</div>
+      <ul>
+        ${its.length === 0 ? '<li class="muted">— κενό —</li>' :
+          its.map(x => `<li><span>${escapeHtml(x.dish.name)} <span class="muted">(${x.qty})</span></span><span class="green">${fmtMoney(x.totalProfit)}</span></li>`).join('')
+        }
+      </ul>
+    </div>`;
+  };
+
+  quadrantsEl.innerHTML =
+    groupBy('star', '★ Stars · Δημοφιλή & Κερδοφόρα', 'Διατήρησέ τα — αυτά είναι τα flagship πιάτα σου.') +
+    groupBy('puzzle', '? Puzzles · Κερδοφόρα αλλά Άγνωστα', 'Πρόώθησέ τα (περιγραφή στο μενού, σερβιτόρος).') +
+    groupBy('plowhorse', '⚙ Plowhorses · Δημοφιλή αλλά Φτωχό Κέρδος', 'Επανεξέτασε κόστος ή τιμή.') +
+    groupBy('dog', '✕ Dogs · Μη Δημοφιλή & Φτωχό Κέρδος', 'Σκέψου να τα αφαιρέσεις από τον κατάλογο.');
+
+  // Table
+  const sorted = [...items].sort((a, b) => b.totalProfit - a.totalProfit);
+  let html = '<thead><tr><th>Πιάτο</th><th>Κατηγορία</th><th class="num">Πωλήσεις</th><th class="num">Δημοτικότητα</th><th class="num">Κόστος</th><th class="num">Margin</th><th class="num">Συν. Κέρδος</th><th class="num">Food Cost %</th><th class="center">Status</th></tr></thead><tbody>';
+  sorted.forEach(x => {
+    const fc = dishFoodCostPct(x.dish);
+    html += `<tr>
+      <td><strong>${escapeHtml(x.dish.name)}</strong></td>
+      <td>${x.dish.category ? `<span class="tag cat">${escapeHtml(x.dish.category)}</span>` : '<span class="muted">—</span>'}</td>
+      <td class="num">${x.qty}</td>
+      <td class="num">${fmtPct(x.popularityPct)}</td>
+      <td class="num">${fmtMoney(dishCost(x.dish))}</td>
+      <td class="num">${fmtMoney(x.margin)}</td>
+      <td class="num green"><strong>${fmtMoney(x.totalProfit)}</strong></td>
+      <td class="num">${fmtPct(fc)}</td>
+      <td class="center"><span class="badge-status ${x.classification}">${x.classification}</span></td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  tableEl.innerHTML = html;
+}
+
+// ============= DASHBOARD =============
+function renderDashboard() {
+  const rest = state.restaurants.find(r => r.id === state.currentRest);
+  document.getElementById('dash-rest').textContent = `· ${rest.name}`;
+
+  const totalIngs = D().ingredients.length;
+  const totalSubs = D().subrecipes.length;
+  const totalDishes = D().dishes.length;
+  const totalSold = D().salesPeriods.reduce((s, p) =>
+    s + Object.values(p.sales || {}).reduce((a, b) => a + Number(b), 0), 0);
+  const totalRev = D().salesPeriods.reduce((s, p) => {
+    return s + Object.entries(p.sales || {}).reduce((a, [dishId, q]) => {
+      const d = D().dishes.find(d => d.id === dishId);
+      return a + (d ? (q * (d.price || 0)) : 0);
+    }, 0);
+  }, 0);
+  const totalProfit = D().salesPeriods.reduce((s, p) => {
+    return s + Object.entries(p.sales || {}).reduce((a, [dishId, q]) => {
+      const d = D().dishes.find(d => d.id === dishId);
+      return a + (d ? (q * dishMargin(d)) : 0);
+    }, 0);
+  }, 0);
+
+  let avgFC = 0;
+  const validDishes = D().dishes.filter(d => d.price > 0);
+  if (validDishes.length > 0) {
+    avgFC = validDishes.reduce((s, d) => s + dishFoodCostPct(d), 0) / validDishes.length;
+  }
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Πιάτα Καταλόγου</div><div class="stat-value accent-text">${totalDishes}</div></div>
+    <div class="stat-card blue"><div class="stat-label">Πρώτες Ύλες</div><div class="stat-value blue">${totalIngs}</div><div class="stat-sub">+ ${totalSubs} sub-recipes</div></div>
+    <div class="stat-card purple"><div class="stat-label">Μέσο Food Cost</div><div class="stat-value purple">${validDishes.length ? fmtPct(avgFC) : '—'}</div><div class="stat-sub">${avgFC <= 30 ? 'άριστο' : avgFC <= 35 ? 'καλό' : 'υψηλό'}</div></div>
+    <div class="stat-card green"><div class="stat-label">Συνολικά Έσοδα</div><div class="stat-value green">${fmtMoney(totalRev)}</div><div class="stat-sub">${totalSold} τμχ πωλήσεις</div></div>
+    <div class="stat-card green"><div class="stat-label">Συνολικό Κέρδος</div><div class="stat-value green">${fmtMoney(totalProfit)}</div></div>
+  `;
+
+  // Top dishes
+  const ranked = D().dishes.map(d => {
+    const totalQty = D().salesPeriods.reduce((s, p) => s + (Number(p.sales?.[d.id]) || 0), 0);
+    return { dish: d, qty: totalQty, profit: totalQty * dishMargin(d), margin: dishMargin(d), fc: dishFoodCostPct(d) };
+  }).sort((a, b) => b.profit - a.profit).slice(0, 10);
+
+  const tEl = document.getElementById('dash-top-dishes');
+  if (ranked.length === 0 || ranked.every(x => x.qty === 0 && D().dishes.length > 0)) {
+    if (D().dishes.length === 0) {
+      tEl.innerHTML = `<thead></thead><tbody><tr><td class="empty"><div class="empty-icon">🍽</div>Πρόσθεσε πιάτα για να δεις στατιστικά.</td></tr></tbody>`;
+    } else {
+      let html = '<thead><tr><th>Πιάτο</th><th>Κατηγορία</th><th class="num">Κόστος</th><th class="num">Τιμή</th><th class="num">Margin</th><th class="num">Food Cost</th></tr></thead><tbody>';
+      D().dishes.forEach(d => {
+        html += `<tr>
+          <td><strong>${escapeHtml(d.name)}</strong></td>
+          <td>${d.category ? `<span class="tag cat">${escapeHtml(d.category)}</span>` : '—'}</td>
+          <td class="num">${fmtMoney(dishCost(d))}</td>
+          <td class="num">${fmtMoney(d.price || 0)}</td>
+          <td class="num green">${fmtMoney(dishMargin(d))}</td>
+          <td class="num">${d.price > 0 ? fmtPct(dishFoodCostPct(d)) : '—'}</td>
+        </tr>`;
+      });
+      html += '</tbody>';
+      tEl.innerHTML = html;
+    }
+  } else {
+    let html = '<thead><tr><th>#</th><th>Πιάτο</th><th>Κατηγορία</th><th class="num">Πωλήσεις</th><th class="num">Margin</th><th class="num">Συν. Κέρδος</th><th class="num">Food Cost</th></tr></thead><tbody>';
+    ranked.forEach((x, i) => {
+      html += `<tr>
+        <td class="muted">${i + 1}</td>
+        <td><strong>${escapeHtml(x.dish.name)}</strong></td>
+        <td>${x.dish.category ? `<span class="tag cat">${escapeHtml(x.dish.category)}</span>` : '—'}</td>
+        <td class="num">${x.qty}</td>
+        <td class="num">${fmtMoney(x.margin)}</td>
+        <td class="num green"><strong>${fmtMoney(x.profit)}</strong></td>
+        <td class="num">${x.dish.price > 0 ? fmtPct(x.fc) : '—'}</td>
+      </tr>`;
+    });
+    html += '</tbody>';
+    tEl.innerHTML = html;
+  }
+}
+
+// ============= EXPORT/IMPORT =============
+function exportData() {
+  const data = {
+    version: 1,
+    exported: new Date().toISOString(),
+    restaurants: state.restaurants,
+    data: state.data,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cost-manager-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Backup δημιουργήθηκε', 'success');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.restaurants || !Array.isArray(data.restaurants)) throw new Error('Μη έγκυρο αρχείο');
+      confirmAction_('Επαναφορά από backup; Όλα τα τρέχοντα δεδομένα θα αντικατασταθούν.', () => {
+        state.restaurants = data.restaurants;
+        state.data = data.data || {};
+        state.currentRest = state.restaurants[0]?.id || null;
+        saveState();
+        renderRestaurants();
+        renderAll();
+        toast('Δεδομένα επαναφέρθηκαν', 'success');
+      });
+    } catch (err) {
+      toast('Σφάλμα: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ============= UI =============
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function confirmAction_(text, action) {
+  document.getElementById('confirm-text').textContent = text;
+  pendingConfirm = action;
+  openModal('confirmModal');
+}
+
+function confirmAction() {
+  if (pendingConfirm) pendingConfirm();
+  closeModal('confirmModal');
+  pendingConfirm = null;
+}
+
+function switchView(view) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
+}
+
+function renderAll() {
+  renderDashboard();
+  renderIngredients();
+  renderSubRecipes();
+  renderDishes();
+  renderSalesPeriodSelects();
+  renderSales();
+  renderMenuEngineering();
+}
+
+// ============= INIT =============
+function init() {
+  loadState();
+  renderRestaurants();
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => switchView(tab.dataset.view));
+  });
+
+  document.getElementById('search-ing').addEventListener('input', renderIngredients);
+  document.getElementById('search-sub').addEventListener('input', renderSubRecipes);
+  document.getElementById('search-dish').addEventListener('input', renderDishes);
+  document.getElementById('filter-cat').addEventListener('change', renderDishes);
+  document.getElementById('sales-period-select').addEventListener('change', renderSales);
+  document.getElementById('me-period-select').addEventListener('change', () => {
+    D().currentPeriod = document.getElementById('me-period-select').value;
+    saveState();
+    renderMenuEngineering();
+  });
+  document.getElementById('me-cat-select').addEventListener('change', renderMenuEngineering);
+
+  // Close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => {
+      if (e.target === m) closeModal(m.id);
+    });
+  });
+
+  // ESC to close
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
+    }
+  });
+
+  renderAll();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
